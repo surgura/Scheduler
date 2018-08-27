@@ -1,4 +1,5 @@
 #include "scheduler/scheduler.h"
+#include <stdio.h>
 
 scd_scheduler scheduler;
 scd_conditional cond1;
@@ -14,6 +15,7 @@ void awake(void* user_data)
     
 }
 
+/*
 void interrupt1()
 {
 
@@ -52,6 +54,16 @@ void read_uart_messages(void* user_data)
     // TODO set iterrupt routine
     scd_scd_add_conditional(&scheduler, &cond1, on_read_done, 0);
     // TODO enable
+}*/
+
+void send_udp_messages(void* user_data)
+{
+    printf("send_udp_messages\n");
+}
+
+void read_uart_messages(void* user_data)
+{
+    printf("read_uart_messages\n");
 }
 
 
