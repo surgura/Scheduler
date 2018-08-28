@@ -1,6 +1,7 @@
 #include "scheduler/scheduler.h"
 #include <stdio.h>
 #include "tcp_acceptor.h"
+#include "async_executor.h"
 
 scd_scheduler scheduler;
 scd_conditional cond1;
@@ -57,6 +58,8 @@ void read_uart_messages(void* user_data)
     // TODO enable
 }*/
 
+async_executor executor;
+
 tcp_socket client;
 
 void receive_messages(void* user_data)
@@ -76,34 +79,41 @@ void receive_messages(void* user_data)
     receive_messages(0);
 }
 
-void accept_connection_accept_do(void* user_data)
+tcp_acceptor acceptor;
+
+void accept_connection_close(void* user_data)
 {
-
-}
-
-void accept_connection_accept_done(void* user_data)
-{
-    
-}
-
-void accept_connection(void* user_data)
-{
-    printf("Creating acceptor\n");
-    tcp_acceptor acceptor;
-    tcp_acceptor_construct(&acceptor);
-    
-    printf("Waiting for connection\n");
-    tcp_acceptor_accept_one(&acceptor, &client);
-
     printf("Closing acceptor\n");
     tcp_acceptor_destruct(&acceptor);
 
     scd_scd_add(&scheduler, receive_messages, 0);
 }
 
+void accept_connection_accept_do(void* user_data)
+{
+    printf("Waiting for connection\n");
+    tcp_acceptor* acceptor = (tcp_acceptor*)user_data;
+    tcp_acceptor_accept_one(acceptor, &client);
+}
+
+void accept_connection_accept_interrupt()
+{
+    scd_scd_add(&scheduler, accept_connection_close, 0);
+}
+
+void accept_connection(void* user_data)
+{
+    printf("Creating acceptor\n");
+    tcp_acceptor_construct(&acceptor);
+
+    async_executor_execute(&executor, accept_connection_accept_do, accept_connection_accept_interrupt, &acceptor);
+}
+
 int main()
 {
     scd_scd_construct(&scheduler, processor_sleep, processor_awake, 0);
+    async_executor_construct(&executor);
+
     scd_scd_add(&scheduler, accept_connection, 0);
     scd_scd_run(&scheduler);
 
