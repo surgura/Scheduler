@@ -76,6 +76,16 @@ void receive_messages(void* user_data)
     receive_messages(0);
 }
 
+void accept_connection_accept_do(void* user_data)
+{
+
+}
+
+void accept_connection_accept_done(void* user_data)
+{
+    
+}
+
 void accept_connection(void* user_data)
 {
     printf("Creating acceptor\n");
