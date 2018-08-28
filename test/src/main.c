@@ -20,41 +20,52 @@ void processor_awake(void* user_data)
 
 coop_tcp_acceptor acceptor;
 coop_tcp_socket client;
+char receive_buffer[2000];
+size_t receive_size;
 
-/*
-void receive_messages(void* user_data)
+void receive_message(void* user_data);
+void receive_message_done(void* user_data)
 {
-    char buffer[2000];
-    int recv_size = tcp_socket_receive(&client, buffer, sizeof(buffer)/sizeof(char)-1);
-    if (recv_size != 0)
+    printf("Message received.\n");
+
+    if (receive_size != 0)
     {
-        buffer[recv_size] = '\0';
-        printf("%s\n", buffer);
+        receive_buffer[receive_size] = '\0';
+        printf("%s\n", receive_buffer);
     }
     else
     {
-        tcp_socket_destruct(&client);
+        printf("Receive failed.\n");
+        coop_tcp_socket_destruct(&client);
         return;
     }
-    receive_messages(0);
-}*/
+
+    receive_message(NULL);
+}
+
+void receive_message(void* user_data)
+{
+    printf("Receiving message..\n");
+    coop_tcp_socket_receive(&client, receive_message_done, NULL, receive_buffer, sizeof(receive_buffer)/sizeof(char)-1, &receive_size);
+}
 
 void accept_connection_done(void* user_data)
 {
     printf("Client accepted.\n");
+    receive_message(NULL);
 }
 
 void accept_connection(void* user_data)
 {
     printf("Accepting client..\n");
+    coop_tcp_socket_construct(&client, &scheduler);
     coop_tcp_acceptor_accept(&acceptor, accept_connection_done, NULL, &client);
 }
 
 void fake_work(void* user_data)
 {
-    printf("Starting fake work\n");
     sleep(1);
-    printf("Fake work done\n");
+    printf("BUSY\n");
     scd_scd_add(&scheduler, fake_work, 0);
 }
 
