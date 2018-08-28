@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-void scd_scd_construct(scd_scheduler* scheduler, void(*sleep)(void* user_data), void(*awake)(void* user_data), void* user_data)
+void scd_scd_construct(scd_scheduler* scheduler, void* user_data)
 {
     lfds711_freelist_init_valid_on_current_logical_core(&scheduler->task_pool_, NULL, 0, NULL);
     for (int i = 0; i < 16; ++i)
