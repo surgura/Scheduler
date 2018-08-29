@@ -49,8 +49,3 @@ void scd_scd_add(scd_scheduler* scheduler, void(*task)(void* user_data), void* u
     task_wrapper->task.user_data = user_data;
     lfds711_queue_bmm_enqueue(&scheduler->task_queue_state_, NULL, fe);
 }
-
-void scd_scd_add_conditional(scd_scheduler* scheduler, scd_conditional* cond, void(*task)(void* user_data), void* user_data)
-{
-
-}

@@ -1,24 +1,28 @@
-CC := gcc
-all: build test
+LFDS711_LOCATION = /home/aart/Libraries/liblfds711
+CC = gcc
+LIB_NAME = libScheduler.a
 
-.PHONY: test
-test:
-	${MAKE} -C test
+CFLAGS = -Wall -Wextra -O3
+INCLUDE = -Iinclude/scheduler -I$(LFDS711_LOCATION)/inc
+OBJ_DIR = ./obj
+LIB_DIR = ./lib
 
-build: libdir lib
+SOURCES = scheduler.c
+OBJECTS = $(patsubst %.c,%.o,$(SOURCES))
 
-libdir:
-	mkdir -p lib
+make: $(LIB_NAME)
 
-lib: obj/scheduler.o
-	ar rcs lib/libscheduler.a obj/scheduler.o
+$(LIB_NAME): $(OBJECTS)
+	ar rcs lib/$(LIB_NAME) obj/$(OBJECTS)
 
-objdir:
-	mkdir -p obj
-
-obj/scheduler.o: objdir
-	${CC} -c src/scheduler.c -o obj/scheduler.o -Iinclude/scheduler
-
+%.o: src/%.c dirmake
+	$(CC) -c $(INCLUDE) $(CFLAGS) -o obj/$@ $<
+	
+dirmake:
+	@mkdir -p $(OBJ_DIR)
+	@mkdir -p $(LIB_DIR)
+	
 clean:
-	rm -r obj
-	rm -r lib
+	rm -rf $(OBJ_DIR) $(LIB_DIR) Makefile.bak
+
+rebuild: clean build
