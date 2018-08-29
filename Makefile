@@ -1,6 +1,6 @@
 LFDS711_LOCATION = /home/aart/Libraries/liblfds711
 CC = gcc
-LIB_NAME = libScheduler.a
+LIB_NAME = libscheduler.a
 
 CFLAGS = -Wall -Wextra -O3
 INCLUDE = -Iinclude/scheduler -I$(LFDS711_LOCATION)/inc
@@ -13,10 +13,10 @@ OBJECTS = $(patsubst %.c,%.o,$(SOURCES))
 make: $(LIB_NAME)
 
 $(LIB_NAME): $(OBJECTS)
-	ar rcs lib/$(LIB_NAME) obj/$(OBJECTS)
+	ar rcs $(LIB_DIR)/$(LIB_NAME) $(OBJ_DIR)/$(OBJECTS)
 
 %.o: src/%.c dirmake
-	$(CC) -c $(INCLUDE) $(CFLAGS) -o obj/$@ $<
+	$(CC) -c $(INCLUDE) $(CFLAGS) -o $(OBJ_DIR)/$@ $<
 	
 dirmake:
 	@mkdir -p $(OBJ_DIR)
